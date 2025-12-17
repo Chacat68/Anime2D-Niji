@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>本地AI画图客户端</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="left">
+        <h1>本地AI画图客户端</h1>
+
+        <label class="field">
+          <div class="label">API Base URL</div>
+          <input id="baseUrl" type="text" value="https://api.openai.com/v1" />
+        </label>
+
+        <label class="field">
+          <div class="label">API Key</div>
+          <input id="apiKey" type="password" placeholder="可选：如果你的API需要" />
+        </label>
+
+        <label class="field">
+          <div class="label">Model</div>
+          <input id="model" type="text" placeholder="可选" />
+        </label>
+
+        <div class="row">
+          <button id="chooseDir">选择目录</button>
+          <div id="dirPath" class="dirPath">未选择</div>
+        </div>
+
+        <label class="field">
+          <div class="label">提示词</div>
+          <textarea id="prompt" rows="6" placeholder="输入提示词..."></textarea>
+        </label>
+
+        <div class="row">
+          <button id="start" class="primary">开始</button>
+          <div id="status" class="status"></div>
+        </div>
+
+        <div class="hint">
+          说明：生成图片会保存到你选择的目录，并自动刷新右侧列表。
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="rightHeader">
+          <div class="title">目录图片</div>
+          <button id="refresh">刷新</button>
+        </div>
+        <div id="grid" class="grid"></div>
+      </div>
+    </div>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>
