@@ -94,15 +94,39 @@ async function createWindow() {
 }
 
 function createMenu() {
+  const isMac = process.platform === 'darwin';
+  
   const template = [
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { label: '关于 ' + app.name, role: 'about' },
+        { type: 'separator' },
+        { label: '退出', accelerator: 'Command+Q', role: 'quit' }
+      ]
+    }] : []),
     {
       label: '文件',
       submenu: [
         {
           label: '退出',
-          accelerator: 'Alt+F4',
-          role: 'quit'
+          accelerator: isMac ? 'Command+Q' : 'Alt+F4',
+          click: () => {
+            app.quit();
+          }
         }
+      ]
+    },
+    {
+      label: '编辑',
+      submenu: [
+        { label: '撤销', accelerator: 'CmdOrCtrl+Z', role: 'undo' },
+        { label: '重做', accelerator: 'Shift+CmdOrCtrl+Z', role: 'redo' },
+        { type: 'separator' },
+        { label: '剪切', accelerator: 'CmdOrCtrl+X', role: 'cut' },
+        { label: '复制', accelerator: 'CmdOrCtrl+C', role: 'copy' },
+        { label: '粘贴', accelerator: 'CmdOrCtrl+V', role: 'paste' },
+        { label: '全选', accelerator: 'CmdOrCtrl+A', role: 'selectAll' }
       ]
     },
     {
@@ -121,6 +145,16 @@ function createMenu() {
           click: () => {
             if (mainWindow) mainWindow.webContents.toggleDevTools();
           }
+        },
+        { type: 'separator' },
+        {
+          label: '全屏',
+          accelerator: isMac ? 'Ctrl+Command+F' : 'F11',
+          click: () => {
+            if (mainWindow) {
+              mainWindow.setFullScreen(!mainWindow.isFullScreen());
+            }
+          }
         }
       ]
     },
@@ -134,7 +168,8 @@ function createMenu() {
               type: 'info',
               title: '关于',
               message: '本地AI画图客户端',
-              detail: 'Version 0.1.0\n支持自定义 API、选择目录加载图片、输入提示词生成图像'
+              detail: '版本 0.1.0\n\n支持自定义 API、选择目录加载图片、输入提示词生成图像\n\n© 2025 Anime2D-Niji',
+              buttons: ['确定']
             });
           }
         }
