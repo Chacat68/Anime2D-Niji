@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -6,26 +6,40 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+let mainWindow = null;
+
 function normalizeBaseUrl(baseUrl) {
   const trimmed = String(baseUrl ?? '').trim();
   if (!trimmed) return '';
   return trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
 }
 
-function uniqueFileName(prefix, ext) {
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const ts =
-    String(now.getFullYear()) +
-    pad(now.getMonth() + 1) +
-    pad(now.getDate()) +
-    '-' +
-    pad(now.getHours()) +
-    pad(now.getMinutes()) +
-    pad(now.getSeconds());
+async function getNextSequence(dirPath, prefix) {
+  try {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    let maxSeq = 0;
 
-  const rand = Math.random().toString(16).slice(2, 8);
-  return `${prefix}-${ts}-${rand}.${ext}`;
+    const pattern = new RegExp(`^${prefix}-(\\d+)\\.(png|jpg|jpeg|webp|gif)$`, 'i');
+    
+    for (const ent of entries) {
+      if (!ent.isFile()) continue;
+      const match = ent.name.match(pattern);
+      if (match) {
+        const seq = parseInt(match[1], 10);
+        if (!isNaN(seq) && seq > maxSeq) {
+          maxSeq = seq;
+        }
+      }
+    }
+
+    return maxSeq + 1;
+  } catch (e) {
+    return 1;
+  }
+}
+
+function sequentialFileName(prefix, seq, ext) {
+  return `${prefix}-${seq}.${ext}`;
 }
 
 function extFromContentType(contentType) {
@@ -62,7 +76,7 @@ async function listImagesInDir(dirPath) {
 }
 
 async function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1100,
     height: 760,
     webPreferences: {
@@ -72,7 +86,64 @@ async function createWindow() {
     }
   });
 
-  await win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+
+  await mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+}
+
+function createMenu() {
+  const template = [
+    {
+      label: '文件',
+      submenu: [
+        {
+          label: '退出',
+          accelerator: 'Alt+F4',
+          role: 'quit'
+        }
+      ]
+    },
+    {
+      label: '视图',
+      submenu: [
+        {
+          label: '重新加载',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            if (mainWindow) mainWindow.reload();
+          }
+        },
+        {
+          label: '调试',
+          accelerator: 'F12',
+          click: () => {
+            if (mainWindow) mainWindow.webContents.toggleDevTools();
+          }
+        }
+      ]
+    },
+    {
+      label: '帮助',
+      submenu: [
+        {
+          label: '关于',
+          click: () => {
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: '关于',
+              message: '本地AI画图客户端',
+              detail: 'Version 0.1.0\n支持自定义 API、选择目录加载图片、输入提示词生成图像'
+            });
+          }
+        }
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 }
 
 app.whenReady().then(async () => {
@@ -90,7 +161,9 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.handle('chooseDirectory', async () => {
-  const result = await dialog.showOpenDialog({
+  if (!mainWindow) return null;
+  
+  const result = await dialog.showOpenDialog(mainWindow, {
     title: '选择图片目录',
     properties: ['openDirectory']
   });
@@ -110,6 +183,7 @@ ipcMain.handle('generateImage', async (_evt, payload) => {
   const model = String(payload?.model ?? '').trim();
   const prompt = String(payload?.prompt ?? '').trim();
   const outputDir = String(payload?.outputDir ?? '');
+  const namePrefix = String(payload?.namePrefix ?? 'generated').trim() || 'generated';
 
   if (!baseUrl) throw new Error('请填写 API Base URL');
   if (!prompt) throw new Error('请填写提示词');
@@ -162,7 +236,8 @@ ipcMain.handle('generateImage', async (_evt, payload) => {
     throw new Error('无法解析 API 返回（未找到 data[0].b64_json 或 data[0].url）');
   }
 
-  const fileName = uniqueFileName('generated', ext);
+  const seq = await getNextSequence(outputDir, namePrefix);
+  const fileName = sequentialFileName(namePrefix, seq, ext);
   const savedPath = path.join(outputDir, fileName);
   await fs.writeFile(savedPath, imageBytes);
 

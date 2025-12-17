@@ -1,10 +1,14 @@
 let selectedDir = null;
+let selectedSaveDir = null;
 
 const elBaseUrl = document.getElementById('baseUrl');
 const elApiKey = document.getElementById('apiKey');
 const elModel = document.getElementById('model');
 const elChooseDir = document.getElementById('chooseDir');
 const elDirPath = document.getElementById('dirPath');
+const elChooseSaveDir = document.getElementById('chooseSaveDir');
+const elSaveDirPath = document.getElementById('saveDirPath');
+const elNamePrefix = document.getElementById('namePrefix');
 const elPrompt = document.getElementById('prompt');
 const elStart = document.getElementById('start');
 const elStatus = document.getElementById('status');
@@ -20,9 +24,15 @@ function setDir(dir) {
   elDirPath.textContent = dir || '未选择';
 }
 
+function setSaveDir(dir) {
+  selectedSaveDir = dir;
+  elSaveDirPath.textContent = dir || '未选择（默认使用图片目录）';
+}
+
 function setBusy(busy) {
   elStart.disabled = busy;
   elChooseDir.disabled = busy;
+  elChooseSaveDir.disabled = busy;
   elRefresh.disabled = busy;
 }
 
@@ -75,7 +85,7 @@ async function refreshImages() {
 elChooseDir.addEventListener('click', async () => {
   try {
     setBusy(true);
-    setStatus('选择目录中...');
+    setStatus('选择图片目录中...');
     const dir = await window.api.chooseDirectory();
     if (!dir) {
       setStatus('已取消');
@@ -84,6 +94,24 @@ elChooseDir.addEventListener('click', async () => {
     setDir(dir);
     setStatus('加载图片中...');
     await refreshImages();
+    setStatus('就绪');
+  } catch (e) {
+    setStatus(e?.message || String(e));
+  } finally {
+    setBusy(false);
+  }
+});
+
+elChooseSaveDir.addEventListener('click', async () => {
+  try {
+    setBusy(true);
+    setStatus('选择保存目录中...');
+    const dir = await window.api.chooseDirectory();
+    if (!dir) {
+      setStatus('已取消');
+      return;
+    }
+    setSaveDir(dir);
     setStatus('就绪');
   } catch (e) {
     setStatus(e?.message || String(e));
@@ -110,6 +138,7 @@ elStart.addEventListener('click', async () => {
   const apiKey = elApiKey.value;
   const model = elModel.value;
   const prompt = elPrompt.value;
+  const namePrefix = elNamePrefix.value;
 
   try {
     setBusy(true);
@@ -120,7 +149,8 @@ elStart.addEventListener('click', async () => {
       apiKey,
       model,
       prompt,
-      outputDir: selectedDir
+      outputDir: selectedSaveDir || selectedDir,
+      namePrefix: namePrefix || 'generated'
     });
 
     setStatus('已保存：' + (result?.savedPath || ''));
@@ -134,5 +164,6 @@ elStart.addEventListener('click', async () => {
 
 // 初始状态
 setDir(null);
+setSaveDir(null);
 renderImages([]);
 setStatus('就绪');

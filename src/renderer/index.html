@@ -27,12 +27,22 @@
         </label>
 
         <div class="row">
-          <button id="chooseDir">选择目录</button>
+          <button id="chooseDir">选择图片目录</button>
           <div id="dirPath" class="dirPath">未选择</div>
         </div>
 
+        <div class="row">
+          <button id="chooseSaveDir">选择保存目录</button>
+          <div id="saveDirPath" class="dirPath">未选择（默认使用图片目录）</div>
+        </div>
+
         <label class="field">
-          <div class="label">提示词</div>
+          <div class="label">文件命名前缀</div>
+          <input id="namePrefix" type="text" value="generated" placeholder="生成文件名前缀" />
+        </label>
+
+        <label class="field">
+          <div 的图片会保存到保存目录（如未设置则使用图片目录），文件名格式为"前缀-序号.png"">提示词</div>
           <textarea id="prompt" rows="6" placeholder="输入提示词..."></textarea>
         </label>
 
