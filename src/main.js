@@ -162,6 +162,13 @@ function createMenu() {
       label: '帮助',
       submenu: [
         {
+          label: '服务商配置说明',
+          click: () => {
+            createHelpWindow();
+          }
+        },
+        { type: 'separator' },
+        {
           label: '关于',
           click: () => {
             dialog.showMessageBox(mainWindow, {
@@ -179,6 +186,22 @@ function createMenu() {
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+}
+
+function createHelpWindow() {
+  const helpWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    parent: mainWindow,
+    modal: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  helpWindow.loadFile(path.join(__dirname, 'renderer', 'help.html'));
+  helpWindow.setMenuBarVisibility(false);
 }
 
 app.whenReady().then(async () => {

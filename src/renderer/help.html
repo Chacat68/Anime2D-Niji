@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务商配置说明</title>
+    <link rel="stylesheet" href="help.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI画图服务商配置指南</h1>
+        
+        <div class="provider-section">
+            <h2>🤖 OpenAI</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>API 地址：</strong>
+                    <code>https://api.openai.com/v1</code>
+                </div>
+                <div class="info-item">
+                    <strong>支持模型：</strong>
+                    <ul>
+                        <li>dall-e-3 - 最新版本，高质量图像生成</li>
+                        <li>dall-e-2 - 经典版本，速度较快</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>获取 API Key：</strong>
+                    <ol>
+                        <li>访问 <a href="https://platform.openai.com/signup" target="_blank">OpenAI 官网注册</a></li>
+                        <li>进入 <a href="https://platform.openai.com/api-keys" target="_blank">API Keys 页面</a></li>
+                        <li>点击 "Create new secret key" 创建密钥</li>
+                    </ol>
+                </div>
+                <div class="info-item">
+                    <strong>官方文档：</strong>
+                    <a href="https://platform.openai.com/docs/guides/images" target="_blank">https://platform.openai.com/docs/guides/images</a>
+                </div>
+                <div class="info-item">
+                    <strong>定价：</strong>
+                    <ul>
+                        <li>DALL-E 3: 约 $0.04 - $0.12 每张图</li>
+                        <li>DALL-E 2: 约 $0.016 - $0.020 每张图</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="provider-section">
+            <h2>🌟 Google Gemini</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>API 地址：</strong>
+                    <code>https://generativelanguage.googleapis.com/v1beta</code>
+                </div>
+                <div class="info-item">
+                    <strong>支持模型：</strong>
+                    <ul>
+                        <li>gemini-2.5-flash-image (Nano Banana) - 快速生成</li>
+                        <li>gemini-3-pro-image-preview (Nano Banana Pro) - 4K高级图像</li>
+                        <li>gemini-2.0-flash-exp - 实验性版本</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>获取 API Key：</strong>
+                    <ol>
+                        <li>访问 <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                        <li>使用 Google 账号登录</li>
+                        <li>点击 "Get API Key" 或 "Create API Key"</li>
+                    </ol>
+                </div>
+                <div class="info-item">
+                    <strong>官方文档：</strong>
+                    <a href="https://ai.google.dev/gemini-api/docs/image-generation" target="_blank">https://ai.google.dev/gemini-api/docs/image-generation</a>
+                </div>
+                <div class="info-item">
+                    <strong>免费额度：</strong>
+                    <ul>
+                        <li>每分钟 15 次请求</li>
+                        <li>每天 1500 次请求</li>
+                        <li>完全免费（截至2025年）</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>注意事项：</strong>
+                    <p>需要在请求 URL 中添加 API Key：<br>
+                    <code>?key=YOUR_API_KEY</code></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="provider-section">
+            <h2>☁️ Azure OpenAI</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>API 地址格式：</strong>
+                    <code>https://YOUR_RESOURCE_NAME.openai.azure.com</code>
+                </div>
+                <div class="info-item">
+                    <strong>支持模型：</strong>
+                    <ul>
+                        <li>dalle3 - 需要在 Azure 部署</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>获取访问权限：</strong>
+                    <ol>
+                        <li>访问 <a href="https://portal.azure.com" target="_blank">Azure 门户</a></li>
+                        <li>创建 "Azure OpenAI" 资源</li>
+                        <li>在资源中部署 DALL-E 3 模型</li>
+                        <li>从 "密钥和终结点" 获取 API Key 和终结点地址</li>
+                    </ol>
+                </div>
+                <div class="info-item">
+                    <strong>官方文档：</strong>
+                    <a href="https://learn.microsoft.com/azure/ai-services/openai/dall-e-quickstart" target="_blank">https://learn.microsoft.com/azure/ai-services/openai/dall-e-quickstart</a>
+                </div>
+                <div class="info-item">
+                    <strong>配置说明：</strong>
+                    <ul>
+                        <li>需要单独的 Azure 订阅</li>
+                        <li>API Key 在 Azure 门户中获取</li>
+                        <li>终结点地址因资源而异</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="provider-section">
+            <h2>🏠 本地 API</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>默认地址：</strong>
+                    <code>http://localhost:8080/v1</code>
+                </div>
+                <div class="info-item">
+                    <strong>适用场景：</strong>
+                    <ul>
+                        <li>本地部署的 Stable Diffusion WebUI</li>
+                        <li>支持 OpenAI 格式的本地服务</li>
+                        <li>自建 AI 画图服务</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>推荐工具：</strong>
+                    <ul>
+                        <li><a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui" target="_blank">Stable Diffusion WebUI</a> - 需要配置 API 扩展</li>
+                        <li><a href="https://github.com/comfyanonymous/ComfyUI" target="_blank">ComfyUI</a> - 支持自定义工作流</li>
+                        <li><a href="https://github.com/mlc-ai/web-stable-diffusion" target="_blank">Web Stable Diffusion</a> - 浏览器内运行</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>配置提示：</strong>
+                    <p>根据本地服务的实际端口和路径修改 API 地址，一般不需要 API Key。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="provider-section">
+            <h2>🔧 自定义服务</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>说明：</strong>
+                    <p>适用于任何兼容 OpenAI 图像生成 API 格式的第三方服务。</p>
+                </div>
+                <div class="info-item">
+                    <strong>常见第三方服务：</strong>
+                    <ul>
+                        <li><a href="https://www.cloudflare.com/developer-platform/workers-ai/" target="_blank">Cloudflare Workers AI</a></li>
+                        <li><a href="https://replicate.com/" target="_blank">Replicate</a></li>
+                        <li><a href="https://huggingface.co/inference-api" target="_blank">Hugging Face Inference API</a></li>
+                        <li>各种 OpenAI 兼容的代理服务</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <strong>配置方法：</strong>
+                    <ol>
+                        <li>填写服务商提供的 API 终结点地址</li>
+                        <li>填写相应的 API Key</li>
+                        <li>填写支持的模型名称</li>
+                        <li>测试连接确认可用</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <h2>💡 使用提示</h2>
+            <div class="tips-grid">
+                <div class="tip-item">
+                    <h3>API Key 安全</h3>
+                    <ul>
+                        <li>不要分享你的 API Key</li>
+                        <li>定期轮换密钥</li>
+                        <li>监控 API 使用量</li>
+                    </ul>
+                </div>
+                <div class="tip-item">
+                    <h3>提示词建议</h3>
+                    <ul>
+                        <li>使用英文提示词效果更好</li>
+                        <li>详细描述场景、风格、光照等</li>
+                        <li>避免模糊或矛盾的描述</li>
+                    </ul>
+                </div>
+                <div class="tip-item">
+                    <h3>费用控制</h3>
+                    <ul>
+                        <li>Google Gemini 提供免费额度</li>
+                        <li>OpenAI 按张数计费</li>
+                        <li>本地运行无 API 费用</li>
+                    </ul>
+                </div>
+                <div class="tip-item">
+                    <h3>故障排查</h3>
+                    <ul>
+                        <li>检查 API Key 是否正确</li>
+                        <li>确认网络连接正常</li>
+                        <li>查看控制台错误信息（F12）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>最后更新：2025年12月18日</p>
+            <button onclick="window.close()" class="close-btn">关闭窗口</button>
+        </div>
+    </div>
+</body>
+</html>
