@@ -1,6 +1,7 @@
 let selectedDir = null;
 let selectedSaveDir = null;
 
+const elProvider = document.getElementById('provider');
 const elBaseUrl = document.getElementById('baseUrl');
 const elApiKey = document.getElementById('apiKey');
 const elModel = document.getElementById('model');
@@ -14,6 +15,128 @@ const elStart = document.getElementById('start');
 const elStatus = document.getElementById('status');
 const elGrid = document.getElementById('grid');
 const elRefresh = document.getElementById('refresh');
+
+// 服务商预设配置
+const PROVIDER_PRESETS = {
+  openai: {
+    baseUrl: 'https://api.openai.com/v1',
+    model: 'dall-e-3',
+    models: [
+      { value: 'dall-e-3', label: 'DALL-E 3' },
+      { value: 'dall-e-2', label: 'DALL-E 2' }
+    ]
+  },
+  gemini: {
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+    model: 'gemini-2.5-flash-image',
+    models: [
+      { value: 'gemini-2.5-flash-image', label: 'Gemini 2.5 Flash (Nano Banana) - 快速' },
+      { value: 'gemini-3-pro-image-preview', label: 'Gemini 3 Pro (Nano Banana Pro) - 4K高级' },
+      { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash Exp' }
+    ]
+  },
+  azure: {
+    baseUrl: 'https://your-resource.openai.azure.com',
+    model: 'dall-e-3',
+    models: [
+      { value: 'dall-e-3', label: 'DALL-E 3' },
+      { value: 'dall-e-2', label: 'DALL-E 2' }
+    ]
+  },
+  local: {
+    baseUrl: 'http://localhost:8000/v1',
+    model: 'stable-diffusion',
+    models: [
+      { value: 'stable-diffusion', label: 'Stable Diffusion' },
+      { value: 'flux', label: 'Flux' },
+      { value: 'midjourney', label: 'Midjourney' }
+    ]
+  },
+  custom: {
+    baseUrl: '',
+    model: '',
+    models: [
+      { value: '', label: '自定义模型' }
+    ]
+  }
+};
+
+// 更新模型选择器
+function updateModelSelector(provider) {
+  const preset = PROVIDER_PRESETS[provider];
+  
+  // 清空现有选项
+  elModel.innerHTML = '';
+  
+  if (preset && preset.models) {
+    // 填充预设模型选项
+    preset.models.forEach(m => {
+      const option = document.createElement('option');
+      option.value = m.value;
+      option.textContent = m.label;
+      elModel.appendChild(option);
+    });
+  } else {
+    // 没有预设模型时显示默认选项
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = '请配置模型';
+    elModel.appendChild(option);
+  }
+}
+
+// 从localStorage加载配置
+function loadProviderConfig(provider) {
+  const saved = localStorage.getItem(`provider_${provider}`);
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error('Failed to parse saved config:', e);
+    }
+  }
+  return PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.custom;
+}
+
+// 保存配置到localStorage
+function saveProviderConfig(provider) {
+  const config = {
+    baseUrl: elBaseUrl.value,
+    apiKey: elApiKey.value,
+    model: elModel.value
+  };
+  localStorage.setItem(`provider_${provider}`, JSON.stringify(config));
+}
+
+// 应用配置到界面
+function applyConfig(config) {
+  elBaseUrl.value = config.baseUrl || '';
+  elApiKey.value = config.apiKey || '';
+  
+  updateModelSelector(elProvider.value);
+  
+  // 设置模型值
+  const modelValue = config.model || PROVIDER_PRESETS[elProvider.value]?.model || '';
+  elModel.value = modelValue;
+}
+
+// 切换服务商
+function switchProvider(provider) {
+  // 保存当前配置
+  const currentProvider = elProvider.value;
+  if (currentProvider) {
+    saveProviderConfig(currentProvider);
+  }
+  
+  // 加载新配置
+  const config = loadProviderConfig(provider);
+  applyConfig(config);
+  
+  // 保存选择的服务商
+  localStorage.setItem('selectedProvider', provider);
+  
+  setStatus('已切换到: ' + elProvider.options[elProvider.selectedIndex].text);
+}
 
 function setStatus(text) {
   elStatus.textContent = text || '';
@@ -161,6 +284,29 @@ elStart.addEventListener('click', async () => {
     setBusy(false);
   }
 });
+
+// 服务商切换事件
+elProvider.addEventListener('change', () => {
+  switchProvider(elProvider.value);
+});
+
+// 模型选择变化时保存
+elModel.addEventListener('change', () => {
+  saveProviderConfig(elProvider.value);
+});
+
+// 配置变化时自动保存
+[elBaseUrl, elApiKey].forEach(el => {
+  el.addEventListener('blur', () => {
+    saveProviderConfig(elProvider.value);
+  });
+});
+
+// 初始化：加载上次选择的服务商
+const lastProvider = localStorage.getItem('selectedProvider') || 'gemini';
+elProvider.value = lastProvider;
+const initialConfig = loadProviderConfig(lastProvider);
+applyConfig(initialConfig);
 
 // 初始状态
 setDir(null);

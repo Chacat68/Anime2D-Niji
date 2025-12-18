@@ -12,6 +12,17 @@
         <h1>本地AI画图客户端</h1>
 
         <label class="field">
+          <div class="label">服务商</div>
+          <select id="provider">
+            <option value="openai">OpenAI</option>
+            <option value="gemini">Google Gemini</option>
+            <option value="azure">Azure OpenAI</option>
+            <option value="local">本地服务</option>
+            <option value="custom">自定义</option>
+          </select>
+        </label>
+
+        <label class="field">
           <div class="label">API Base URL</div>
           <input id="baseUrl" type="text" value="https://api.openai.com/v1" />
         </label>
@@ -23,7 +34,9 @@
 
         <label class="field">
           <div class="label">Model</div>
-          <input id="model" type="text" placeholder="可选" />
+          <select id="model">
+            <option value="">选择模型...</option>
+          </select>
         </label>
 
         <div class="row">

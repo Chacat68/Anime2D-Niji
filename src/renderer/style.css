@@ -49,17 +49,23 @@ h1 {
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 10px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 13px;
   outline: none;
+  background: #ffffff;
 }
 
 textarea {
   resize: vertical;
+}
+
+select {
+  cursor: pointer;
 }
 
 button {
